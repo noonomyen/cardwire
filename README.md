@@ -18,6 +18,10 @@ Creator and Main maintainer: @luytan
 
 Head to the [docs](https://opengamingcollective.github.io/cardwire) to see how to install and use Cardwire on your system
 
+## Fork Modifications
+
+For custom features and modifications included in this fork (such as user-defined `allowed_programs`), see [docs/customizations.md](docs/customizations.md).
+
 ## How it works
 
 Cardwire uses eBPF with LSM hooks to intercept file operations on GPU device nodes, such as `/dev/dri/renderDX`, `/dev/dri/cardX`, sysfs `config`, `nvidiaX` and other GPU-related files.

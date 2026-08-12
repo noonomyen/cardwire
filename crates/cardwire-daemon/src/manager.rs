@@ -204,6 +204,12 @@ impl DaemonManager {
         for comm in ALLOWED_PROGRAMS {
             blocker.allow_comm(comm)?;
         }
+
+        let user_allowed_programs = self.inner.config.allowed_programs.read().await;
+        for comm in &*user_allowed_programs {
+            blocker.allow_comm(comm)?;
+        }
+
         Ok(())
     }
     async fn populate_state_file(&self) -> Result<()> {

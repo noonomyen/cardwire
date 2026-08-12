@@ -19,6 +19,7 @@ pub struct ConfigMemory {
     pub battery_auto_switch: Arc<AtomicBool>,
     pub battery_auto_switch_mode: Arc<AtomicU32>,
     pub external_display_auto_switch: Arc<AtomicBool>,
+    pub allowed_programs: Arc<RwLock<Vec<String>>>,
     save_lock: Arc<tokio::sync::Mutex<()>>,
 }
 impl ConfigMemory {
@@ -33,12 +34,15 @@ impl ConfigMemory {
         ));
         let external_display_auto_switch =
             Arc::new(AtomicBool::new(user_config.external_display_auto_switch()));
+        let allowed_programs = Arc::new(RwLock::new(user_config.allowed_programs().to_vec()));
+
         ConfigMemory {
             auto_apply_gpu_state,
             experimental_nvidia_block,
             battery_auto_switch,
             battery_auto_switch_mode,
             external_display_auto_switch,
+            allowed_programs,
             save_lock: Arc::new(tokio::sync::Mutex::new(())),
         }
     }
@@ -155,6 +159,7 @@ impl ConfigInterface {
             self.config
                 .external_display_auto_switch
                 .load(Ordering::Relaxed),
+            self.config.allowed_programs.read().await.to_vec(),
         );
 
         // Save to file, if the file is read-only, only warn and return OK, this happen on nixos
@@ -192,7 +197,7 @@ mod tests {
 
     #[test]
     fn test_config_memory_build_from_custom_config() {
-        let config = CardwireConfig::new(false, true, true, Modes::Smart, true);
+        let config = CardwireConfig::new(false, true, true, Modes::Smart, true, vec![]);
         let memory = ConfigMemory::build(config);
         assert!(!memory.auto_apply_gpu_state.load(Ordering::Relaxed));
         assert!(memory.experimental_nvidia_block.load(Ordering::Relaxed));
